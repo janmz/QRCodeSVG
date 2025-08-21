@@ -22,9 +22,9 @@ function buildQRCodeSVG($text, $width, $fg, $bg, $variation, $ecl = QR_ERROR_COR
 $text = 'Test von QRCode SVG';
 $width = 256;
 $configs = array(
-	array('label' => 'normal',  'fg' => '#1d4ed8a0', 'bg' => '#ff000020'),
-	array('label' => 'rounded', 'fg' => '#048659ff', 'bg' => '#ffff00ff'),
+	array('label' => 'normal',  'fg' => '#1d4ed8a0', 'bg' => '#ffffff00'),
 	array('label' => 'dotted',  'fg' => '#dc2626e0', 'bg' => '#00000030'),
+	array('label' => 'rounded', 'fg' => '#048659ff', 'bg' => '#ffff00ff'),
 );
 ?>
 <!DOCTYPE html>
@@ -53,25 +53,31 @@ $configs = array(
 	<h1>QRCode SVG – Varianten</h1>
 	<p>Text: <strong><?= htmlspecialchars($text, ENT_QUOTES, 'UTF-8') ?></strong></p>
 	<div class="donate">
-	<div class="qrcode"><?php
-        $data = "BCD\n002\n2\nSCT\nBFSWDE33XXX\nCFI Int. Kinderhilfe Deutschland\nDE65370205000008753503\nEUR15.00\nCHAR\n\nSpende für SVGVAYA Donationware\n";
-		$qr = QRCodeSVG::getMinimumQRCode($data, QR_ERROR_CORRECT_LEVEL_M); // Für Giro QR Codes verpflichtend
-        echo $qr->getSVG(200, "#700096", "#B38CC01C", "Giro QR Code für Spende an CFI","rounded");
-?></br><p>QR Code für Banking-App</p></div>
+		<div class="qrcode"><?php
+			$data = "BCD\n002\n2\nSCT\nBFSWDE33XXX\nCFI Int. Kinderhilfe Deutschland\nDE65370205000008753503\nEUR15.00\nCHAR\n\nSpende für SVGVAYA Donationware\n";
+			$qr = QRCodeSVG::getMinimumQRCode($data, QR_ERROR_CORRECT_LEVEL_M); // Für Giro QR Codes verpflichtend
+			echo $qr->getSVG(200, "#700096", "#B38CC01C", "Giro QR Code für Spende an CFI","rounded");
+			?></br>
+			<p>QR Code für Banking-App</p>
+		</div>
 		<p>Als kleines Dankeschön freuen wir uns über eine Spende an die
-		<a href="https://cfi-kinderhilfe.de/jetzt-spenden/?q=SVGVAYA" target="_blank" rel="noopener noreferrer">CFI‑Kinderhilfe</a>.
-</p>
-<p>Dazu kann auch der rechts stehende QR-Code mit einer Banking-App als Fotoüberweisung eingelesen werden.</p>
+		<a href="https://cfi-kinderhilfe.de/jetzt-spenden/?q=SVGVAYA" alt="Verweis auf Spendenseit von CFI" target="_blank" rel="noopener noreferrer">CFI‑Kinderhilfe</a>.
+		</p>
+		<p>Dazu kann auch der rechts stehende QR-Code mit einer Banking-App als Fotoüberweisung eingelesen werden.</p>
+		<p>Wichtig ist nur, dass die Kennung SVGVAYA als im Hinweisfeld bzw. dem Verwendungszweck angegeben wird.</p>
 	</div>
 	<div class="grid">
 		<?php foreach ($configs as $cfg): ?>
 			<div class="card">
 				<h2>Variante: <?= htmlspecialchars($cfg['label'], ENT_QUOTES, 'UTF-8') ?></h2>
 				<div class="qr">
-					<?= buildQRCodeSVG($text, $width, $cfg['fg'], $cfg['bg'], $cfg['label']); ?>
+					<?php $code = buildQRCodeSVG($text, $width, $cfg['fg'], $cfg['bg'], $cfg['label']);  echo $code; ?>
 				</div>
 				<div class="meta">
 					Farbe: <code><?= htmlspecialchars($cfg['fg'], ENT_QUOTES, 'UTF-8') ?></code> &nbsp; Hintergrund: <code><?= htmlspecialchars($cfg['bg'], ENT_QUOTES, 'UTF-8') ?></code>
+				</div>
+				<div class="code">
+					Beginn der SVG-Definition: <code><?= htmlspecialchars(mb_substr($code, 0, 512) . '…', ENT_QUOTES, 'UTF-8') ?></code>
 				</div>
 			</div>
 		<?php endforeach; ?>
