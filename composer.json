@@ -1,0 +1,37 @@
+{
+  "name": "janmz/qrcode-svg-php",
+  "description": "Generate QR Codes as compact SVGs in PHP with normal, rounded, and dotted variants.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    { "name": "Kazuhiko Arase" },
+    { "name": "Jan Neuhaus", "email": "jan.neuhaus@vaya-consulting.de", "homepage": "https://vaya-consulting.de/development" }
+  ],
+  "require": {
+    "php": ">=5.6"
+  },
+  "autoload": {
+    "classmap": [
+      "qrcode.php",
+      "qrcodesvg.php"
+    ]
+  },
+  "support": {
+    "issues": "https://github.com/janmz/qrcode-svg-php/issues"
+  },
+  "funding": [
+    {
+      "type": "custom",
+      "url": "https://cfi-kinderhilfe.de/jetzt-spenden/?q=SVGVAYA"
+    }
+  ],
+  "keywords": [
+    "qrcode",
+    "svg",
+    "php",
+    "barcode",
+    "generator"
+  ]
+}
+
+

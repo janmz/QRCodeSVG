@@ -1,0 +1,10 @@
+vendor/
+composer.lock
+.idea/
+.vscode/
+*.code-workspace
+.DS_Store
+Thumbs.db
+*.log
+
+

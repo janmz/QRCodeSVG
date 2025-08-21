@@ -1,0 +1,17 @@
+* text=auto eol=lf
+
+/.github export-ignore
+/test_varianten.php export-ignore
+/CONTRIBUTING.md export-ignore
+/SECURITY.md export-ignore
+
+* text=auto eol=lf
+
+# Exclude non-essential files from release archives
+/.github export-ignore
+/test_varianten.php export-ignore
+/CONTRIBUTING.md export-ignore
+/SECURITY.md export-ignore
+/README.md export-ignore
+
+
