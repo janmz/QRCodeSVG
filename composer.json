@@ -3,18 +3,20 @@
   "description": "Generate QR Codes as compact SVGs in PHP with normal, rounded, and dotted variants.",
   "type": "library",
   "license": "MIT",
-  "authors": [
+  "autoload": {
+    "files": [
+        "qrcode-generator/qrcode.php"
+    ],
+    "classmap": [
+        "qrcodesvg.php"
+    ]
+},
+"authors": [
     { "name": "Kazuhiko Arase" },
     { "name": "Jan Neuhaus", "email": "jan.neuhaus@vaya-consulting.de", "homepage": "https://vaya-consulting.de/development" }
   ],
   "require": {
-    "php": ">=5.6",
-    "vaya/qrcode-php": "dev-master"
-  },
-  "autoload": {
-    "classmap": [
-      "qrcodesvg.php"
-    ]
+    "php": ">=7.0"
   },
   "support": {
     "issues": "https://github.com/janmz/qrcodesvgphp/issues"

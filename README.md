@@ -25,10 +25,10 @@ Then visit `http://localhost:8000/test_varianten.php` to see the variants for th
 Using composer and run in your project folder:
 
 ```bash
-    composer require janmz/qrcode-svg-php
+    composer require github.com/janmz/qrcodesvg:dev-main
 ```
 
-This will also install the dependency vaya/qrcode-php and set up autoloading.
+This will include the dependency qrcode-generator/qrcode.php which is updated via a githup workflow to avoid distributing the complete package.
 
 In the code just use:
 

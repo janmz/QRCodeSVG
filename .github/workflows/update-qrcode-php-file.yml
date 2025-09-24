@@ -1,0 +1,57 @@
+name: Update QRCode PHP File
+on:
+  schedule:
+    - cron: '0 2 * * 0'  # Sonntags um 2 Uhr
+  workflow_dispatch:     # Manuell ausführbar
+
+jobs:
+  update-qrcode:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create vendor directory if not exists
+        run: mkdir -p qrcode-generator
+
+      - name: Download current qrcode.php from upstream
+        run: |
+          curl -s -o /tmp/qrcode_new.php https://raw.githubusercontent.com/kazuhikoarase/qrcode-generator/master/php/qrcode.php
+
+      - name: Check if file needs update
+        id: check_update
+        run: |
+          if [ -f "qrcode-generator/qrcode.php" ]; then
+            if cmp -s /tmp/qrcode_new.php qrcode-generator/qrcode.php; then
+              echo "needs_update=false" >> $GITHUB_OUTPUT
+              echo "File is already up to date"
+            else
+              echo "needs_update=true" >> $GITHUB_OUTPUT
+              echo "File needs update"
+            fi
+          else
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+            echo "File does not exist, will be created"
+          fi
+
+      - name: Update file if needed
+        if: steps.check_update.outputs.needs_update == 'true'
+        run: |
+          cp /tmp/qrcode_new.php qrcode-generator/qrcode.php
+          
+          # Git-Konfiguration
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Änderungen committen
+          git add qrcode-generator/qrcode.php
+          git commit -m "Update qrcode.php from upstream ($(date '+%Y-%m-%d'))"
+          git push
+
+      - name: Output result
+        run: |
+          if [ "${{ steps.check_update.outputs.needs_update }}" = "true" ]; then
+            echo "✅ qrcode.php was updated successfully"
+          else
+            echo "ℹ️ qrcode.php was already up to date"
+          fi

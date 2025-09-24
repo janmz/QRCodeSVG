@@ -1,10 +1,12 @@
 <?php
 /*
+
 Composer installation (run in your project):
 
-    composer require janmz/qrcode-svg-php
+    composer require github.com/janmz/qrcodesvg:dev-main
 
-This will also install the dependency vaya/qrcode-php and set up autoloading.
+This will include the dependency qrcode-generator/qrcode.php which is updated via a githup workflow to avoid distributing the complete package.
+
 */
 
 require __DIR__ . '/vendor/autoload.php';
@@ -21,5 +23,3 @@ $svg = $qr->getSVG(256, '#000', '#ffffff00', 'QR Code example', 'rounded');
 
 header('Content-Type: image/svg+xml');
 echo $svg;
-
-
