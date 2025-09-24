@@ -9,6 +9,7 @@
  *  rounded: Each group of blocks is given rounded corners
  * 
  * It is based on the class QRCode by Kazuhiko Arase (https://github.com/kazuhikoarase/qrcode-generator)
+ * This original class is included in vendor/vaya/qrcode-php/qrcode.php and will be autoloaded by composer.
  * 
  * Author: Jan Neuhaus, VAYA Consulting
  * 
@@ -21,9 +22,6 @@
  * 1.0 Initial programming
  * 
  */
-
- // Import Class QRCode
-require_once('qrcode.php');
 
 // helper-function for debug output
 function asdigit($x) {

@@ -6,5 +6,6 @@ composer.lock
 .DS_Store
 Thumbs.db
 *.log
+update.bat
 
 
