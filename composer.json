@@ -1,5 +1,5 @@
 {
-  "name": "janmz/qrcode-svg-php",
+  "name": "janmz/qrcodesvg",
   "description": "Generate QR Codes as compact SVGs in PHP with normal, rounded, and dotted variants.",
   "type": "library",
   "license": "MIT",
@@ -17,7 +17,7 @@
     ]
   },
   "support": {
-    "issues": "https://github.com/janmz/qrcode-svg-php/issues"
+    "issues": "https://github.com/janmz/qrcodesvgphp/issues"
   },
   "funding": [
     {
