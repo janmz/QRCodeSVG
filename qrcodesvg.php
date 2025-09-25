@@ -15,7 +15,7 @@
  * 
  * Created: 5.8.2025
  * 
- * Version: 1.2
+ * Version: 1.3
  * 
  * 1.2 Added the different variations and optimized to backgroud into at most one rect
  * 1.1 Transformed into a class
