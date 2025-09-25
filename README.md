@@ -6,7 +6,7 @@ PHP library to generate QR Codes as compact, stylable SVGs. It extends the MIT-l
 
 - Normal, rounded and dotted QR styles
 - Foreground/background colors with alpha (#rrggbbaa, rgba(), etc.)
-- Clean, compact SVG output (no rasterization)
+- Clean, size-optimized/compact SVG output (no rasterization)
 - High error correction by default (Level H)
 - Simple API and demo page
 
@@ -95,10 +95,19 @@ Other methods come from the base `QRCode` class: `addData`, `setTypeNumber`, `se
 ## Development
 
 - Demo page: `test_varianten.php`
-- Core classes: `qrcode.php` (base), `qrcodesvg.php` (SVG renderer)
+- Core class: `qrcodesvg.php` (SVG renderer)
+- Base class: `qrcode.php` is only importet and should not be changed. To avoid copying the complete repository of the base class, which also includes implementations for other languages/environments a trick is used. The current file is updated via a github workflow and included into a special folder in this repository. If You want to develop in a fork, make shure also to use the github workflow or build a small script for Your own.
 
-Run a local server with `php -S localhost:8000` and open the demo page.
+Run a local server with `php -S localhost:8000` and open the demo page `https://localhost/test_varianten.php`.
 
+## Roadmap
+
+Open features list:
+- merging the qrcode with a logo in the midde (can be done via HTML/CSS right now)
+- gradients in the background
+- gradients in the boxes
+- gradients over the foreground
+  
 ## License
 
 MIT. See `LICENSE`.
@@ -106,7 +115,6 @@ MIT. See `LICENSE`.
 ## Credits
 
 - Original QR code generator: Kazuhiko Arase (<https://github.com/kazuhikoarase/qrcode-generator>)
-- SVG extensions and variations: Jan Neuhaus, VAYA Consulting
 
 ## Support / Donate
 
