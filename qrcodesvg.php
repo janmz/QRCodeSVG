@@ -15,8 +15,10 @@
  * 
  * Created: 5.8.2025
  * 
- * Version: 1.3
+ * Version: 1.4
  * 
+ * 1.4 Added an hight overlap to avoid stripes in all resolutions 
+ * 1.3 Finalized the class and added the ability to use the class without composer
  * 1.2 Added the different variations and optimized to backgroud into at most one rect
  * 1.1 Transformed into a class
  * 1.0 Initial programming
@@ -136,6 +138,7 @@ class QRCodeSVG extends QRCode {
      */
     public function getSVG($width, $fg = "#000000FF", $bg="#ffffff00", $alt_text="", $variation="normal") {
 
+        $height_overlap = 0.005;
         $blocks = $this->getModuleCount();
         $buffer = '<svg role="img"';
         if (trim($alt_text)!="") {
@@ -148,7 +151,7 @@ class QRCodeSVG extends QRCode {
         $bg = $this->makeShortestColor($bg);
         $bg_transparent = strlen($bg)==9 && substr($bg,7,2)=="00";
 
-        $buffer .= '<defs><rect id="p" width="1" height="1"/></defs>';
+        $buffer .= '<defs><rect id="p" width="1" height="'.(1+$height_overlap).'"/></defs>';
 
         if (!$bg_transparent) {
             // Hintergrund immer als komplettes Rechteck zeichnen
@@ -163,6 +166,10 @@ class QRCodeSVG extends QRCode {
             for ($r = 0; $r < $blocks; $r++) {
                 $c_start = 0;
                 $last = $this->isDark($r, 0);
+                if ($r==$blocks-1) {
+                    // In the lowest row, the overlap is not needed
+                    $height_overlap = 0;
+                }
                 for ($c = 1; $c < $blocks; $c++) {
                     // Zuerst nur die "dunklen" Pixel
                     $akt = $this->isDark($r, $c);
@@ -226,7 +233,7 @@ class QRCodeSVG extends QRCode {
             $x1 = $c_start;
             $x2 = $c;
             $y1 = $r;
-            $y2 = $r+1;
+            $y2 = $r+1+$height_overlap;
             if (!$upleft && !$upright && !$downleft && !$downright) {
                 // 0000 - Keine Kontakte => Linker und Rechter Halbkreis
                 // .<#>.
