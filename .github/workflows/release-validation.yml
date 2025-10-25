@@ -1,0 +1,55 @@
+name: Release Validation
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  validate-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.3
+        extensions: gd, imagick
+        tools: composer
+        
+    - name: Install dependencies
+      run: composer install --no-dev --optimize-autoloader
+      
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y inkscape imagemagick librsvg2-bin
+        
+    - name: Run comprehensive tests
+      run: |
+        cd test
+        php regression_test.php
+        
+    - name: Validate release
+      if: success()
+      run: |
+        echo "✅ Release validation successful!"
+        echo "📦 Release ${{ github.event.release.tag_name }} has passed all tests"
+        echo "🚀 Release is ready for distribution"
+        
+    - name: Create release artifacts
+      if: success()
+      run: |
+        # Create a simple release artifact with test results
+        echo "Release ${{ github.event.release.tag_name }} - All Tests Passed" > release-validation.txt
+        echo "Tested on: $(date)" >> release-validation.txt
+        echo "PHP Version: $(php --version | head -1)" >> release-validation.txt
+        
+    - name: Upload validation results
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-validation-${{ github.event.release.tag_name }}
+        path: release-validation.txt

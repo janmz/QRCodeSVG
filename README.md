@@ -18,7 +18,7 @@ Start a local PHP server and open the test page:
 php -S localhost:8000
 ```
 
-Then visit `http://localhost:8000/test_varianten.php` to see the variants for the text "Test von QRCode SVG" in different colors.
+Then visit `http://localhost:8000/test/test_varianten.php` to see the variants for the text "Test von QRCode SVG" in different colors.
 
 ## Installation
 
@@ -98,7 +98,36 @@ Other methods come from the base `QRCode` class: `addData`, `setTypeNumber`, `se
 - Core class: `qrcodesvg.php` (SVG renderer)
 - Base class: `qrcode.php` is only importet and should not be changed. To avoid copying the complete repository of the base class, which also includes implementations for other languages/environments a trick is used. The current file is updated via a github workflow and included into a special folder in this repository. If You want to develop in a fork, make shure also to use the github workflow or build a small script for Your own.
 
-Run a local server with `php -S localhost:8000` and open the demo page `https://localhost/test_varianten.php`.
+Run a local server with `php -S localhost:8000` and open the demo page `https://localhost/test/test_varianten.php`.
+
+## Testing
+
+The project includes comprehensive regression tests to ensure visual consistency across different PHP versions and environments.
+
+### Running Tests
+
+```bash
+cd test
+php regression_test.php
+```
+
+### Test Coverage
+
+- **Visual regression tests** with PNG comparison (90 test cases)
+- **Multiple QR code variants** (normal, rounded, dotted)
+- **Color combinations** with transparency
+- **Path vs Elements rendering comparison** (45 comparisons)
+- **Cross-platform SVG to PNG conversion**
+- **Automatic Path/Elemente validation** during baseline generation and current testing
+
+### Automated Testing
+
+Tests run automatically on:
+- Every push to `main` or `develop` branches
+- Pull requests against `main`
+- Release creation (as prerequisite)
+
+See `test/README.md` for detailed testing documentation.
 
 ## Roadmap
 

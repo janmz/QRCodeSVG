@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 function buildQRCodeSVG($text, $width, $fg, $bg, $variation, $ecl = QR_ERROR_CORRECT_LEVEL_H) {
 	$mode = QRUtil::getMode($text);

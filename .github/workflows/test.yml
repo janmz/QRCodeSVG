@@ -1,0 +1,83 @@
+name: QRCodeSVG Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: [8.1, 8.2, 8.3]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: gd, imagick
+        tools: composer
+        
+    - name: Install dependencies
+      run: composer install --no-dev --optimize-autoloader
+      
+    - name: Install system dependencies for SVG to PNG conversion
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y inkscape imagemagick librsvg2-bin
+        
+    - name: Run regression tests
+      run: |
+        cd test
+        php regression_test.php
+        
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-${{ matrix.php-version }}
+        path: test/regression_test/current/
+        
+  release-check:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'release'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.3
+        extensions: gd, imagick
+        tools: composer
+        
+    - name: Install dependencies
+      run: composer install --no-dev --optimize-autoloader
+      
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y inkscape imagemagick librsvg2-bin
+        
+    - name: Run final release tests
+      run: |
+        cd test
+        php regression_test.php
+        
+    - name: Create release notes
+      if: success()
+      run: |
+        echo "✅ All tests passed successfully!"
+        echo "📦 Release ${{ github.event.release.tag_name }} is ready for distribution."
