@@ -117,26 +117,39 @@ class QRCodeSVGRegressionTest {
         echo "QRCodeSVG Regression Test\n";
         echo "========================\n\n";
         
+        $allTestsPassed = true;
+        
         if ($generateBaseline) {
             echo "Generating baseline images...\n";
             $this->generateTestImages($this->baselineDir);
             echo "Baseline generation complete!\n\n";
             
             echo "Comparing Path vs Elemente variants in baseline...\n";
-            $this->comparePathVsElemente($this->baselineDir);
+            $pathElementePassed = $this->comparePathVsElemente($this->baselineDir);
+            $allTestsPassed = $allTestsPassed && $pathElementePassed;
         } else {
             echo "Generating current images...\n";
             $this->generateTestImages($this->currentDir);
             echo "Current generation complete!\n\n";
             
             echo "Comparing images...\n";
-            $this->compareImages();
+            $comparisonPassed = $this->compareImages();
+            $allTestsPassed = $allTestsPassed && $comparisonPassed;
             
             echo "\nComparing Path vs Elemente variants in current...\n";
-            $this->comparePathVsElemente($this->currentDir);
+            $pathElementePassed = $this->comparePathVsElemente($this->currentDir);
+            $allTestsPassed = $allTestsPassed && $pathElementePassed;
         }
         
         echo "\nRegression test complete!\n";
+        
+        if (!$allTestsPassed) {
+            echo "\n❌ TESTS FAILED - Some regressions detected!\n";
+            exit(1);
+        } else {
+            echo "\n✅ ALL TESTS PASSED!\n";
+            exit(0);
+        }
     }
     
     private function generateTestImages($outputDir) {
@@ -810,7 +823,11 @@ class QRCodeSVGRegressionTest {
                 continue;
             }
             
-            if ($this->compareImageFiles($pathFile, $elementeFile)) {
+            // Create diff name without Path/Elemente suffix
+            $baseName = str_replace(['-Path.png', '-Elemente.png'], '', $filename);
+            $diffName = $baseName . '-patherror_diff.png';
+            
+            if ($this->compareImageFiles($pathFile, $elementeFile, true, $diffName)) {
                 $passed++;
                 echo "✓ $filename vs $elementeFilename - IDENTICAL\n";
             } else {
@@ -848,7 +865,7 @@ class QRCodeSVGRegressionTest {
                 continue;
             }
             
-            if ($this->compareImageFiles($baselineFile, $currentFile)) {
+            if ($this->compareImageFiles($baselineFile, $currentFile, true, str_replace('.png', '-diff.png', $filename))) {
                 $passed++;
                 echo "✓ $filename - PASSED\n";
             } else {
@@ -867,9 +884,11 @@ class QRCodeSVGRegressionTest {
         } else {
             echo "\nAll tests passed! No regressions detected.\n";
         }
+        
+        return empty($errors);
     }
     
-    private function compareImageFiles($file1, $file2) {
+    private function compareImageFiles($file1, $file2, $createDiff = false, $diffName = null) {
         // First check if files exist and have reasonable sizes
         if (!file_exists($file1) || !file_exists($file2)) {
             return false;
@@ -883,7 +902,11 @@ class QRCodeSVGRegressionTest {
         
         // If files are very small (likely placeholders), use exact comparison
         if ($size1 < 1000 && $size2 < 1000) {
-            return $size1 === $size2 && md5_file($file1) === md5_file($file2);
+            $identical = $size1 === $size2 && md5_file($file1) === md5_file($file2);
+            if (!$identical && $createDiff && $diffName) {
+                $this->createDiffImage($file1, $file2, $diffName);
+            }
+            return $identical;
         }
         
         // For larger files, use ImageMagick comparison with tolerance
@@ -901,32 +924,87 @@ class QRCodeSVGRegressionTest {
                     // For transparent images, just check if they're both transparent
                     $alpha1 = $img1->getImageAlphaChannel();
                     $alpha2 = $img2->getImageAlphaChannel();
+                    $identical = $alpha1 === $alpha2;
+                    
+                    if (!$identical && $createDiff && $diffName) {
+                        $this->createDiffImage($file1, $file2, $diffName);
+                    }
+                    
                     $img1->destroy();
                     $img2->destroy();
                     
-                    return $alpha1 === $alpha2;
+                    return $identical;
                 }
                 
                 // Compare images with some tolerance for minor rendering differences
                 $result = $img1->compareImages($img2, Imagick::METRIC_MEANSQUAREERROR);
                 $difference = $result[1];
                 
+                $identical = $difference < $this->tolerance;
+                
+                if (!$identical && $createDiff && $diffName) {
+                    $this->createDiffImage($file1, $file2, $diffName);
+                }
+                
                 $img1->clear();
                 $img1->destroy();
                 $img2->clear();
                 $img2->destroy();
                 
-                // Allow small differences (threshold of 0.01)
-                return $difference < 0.01;
+                return $identical;
                 
             } catch (Exception $e) {
                 // ImageMagick comparison failed, fall back to binary comparison
-                return false;
+                $identical = md5_file($file1) === md5_file($file2);
+                if (!$identical && $createDiff && $diffName) {
+                    $this->createDiffImage($file1, $file2, $diffName);
+                }
+                return $identical;
             }
         }
         
         // Fallback: binary comparison
-        return md5_file($file1) === md5_file($file2);
+        $identical = md5_file($file1) === md5_file($file2);
+        if (!$identical && $createDiff && $diffName) {
+            $this->createDiffImage($file1, $file2, $diffName);
+        }
+        return $identical;
+    }
+    
+    private function createDiffImage($file1, $file2, $diffName) {
+        if (!extension_loaded('imagick')) {
+            return false;
+        }
+        
+        try {
+            $img1 = new Imagick($file1);
+            $img2 = new Imagick($file2);
+            
+            // Ensure both images have the same size
+            $img1->resizeImage(1024, 1024, Imagick::FILTER_LANCZOS, 1);
+            $img2->resizeImage(1024, 1024, Imagick::FILTER_LANCZOS, 1);
+            
+            // Create difference image
+            $img1->compositeImage($img2, Imagick::COMPOSITE_DIFFERENCE, 0, 0);
+            
+            // Enhance differences for better visibility
+            $img1->normalizeImage();
+            $img1->contrastImage(1);
+            
+            // Save diff image
+            $diffPath = $this->currentDir . '/' . $diffName;
+            $img1->writeImage($diffPath);
+            
+            $img1->destroy();
+            $img2->destroy();
+            
+            echo "Created diff image: $diffName\n";
+            return true;
+            
+        } catch (Exception $e) {
+            echo "Failed to create diff image: " . $e->getMessage() . "\n";
+            return false;
+        }
     }
     
     public function cleanup() {

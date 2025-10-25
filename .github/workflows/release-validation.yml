@@ -2,7 +2,7 @@ name: Release Validation
 
 on:
   release:
-    types: [ created ]
+    types: [ published ]
 
 jobs:
   validate-release:
@@ -35,9 +35,9 @@ jobs:
     - name: Validate release
       if: success()
       run: |
-        echo "✅ Release validation successful!"
-        echo "📦 Release ${{ github.event.release.tag_name }} has passed all tests"
-        echo "🚀 Release is ready for distribution"
+        echo "Release validation successful!"
+        echo "Release ${{ github.event.release.tag_name }} has passed all tests"
+        echo "Release is ready for distribution"
         
     - name: Create release artifacts
       if: success()
