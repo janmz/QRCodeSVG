@@ -3,6 +3,7 @@ composer.lock
 .idea/
 .vscode/
 test/regression_test/current/*
+test/regression_test/executable_cache.json
 *.code-workspace
 .DS_Store
 Thumbs.db
